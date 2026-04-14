@@ -18,8 +18,7 @@ The pipeline:
 
 **3. Diarize the meeting**
 * Tool for sound extraction: `ffmpeg` + thin python wrapper
-* Diarizer: TBA
-* Local runtime: TBA
+* Diarizer + runtime: `pyannotate.audio`
 * Save all the results (most importantly speaker_id + segments) as `meeting-diary.jsonl` in the `/Volumes/Index/Temp`
 
 **4. Slice the meeting audio into pieces according to the diarizer**
