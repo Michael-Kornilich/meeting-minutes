@@ -24,7 +24,7 @@ The pipeline:
 **4. Slice the meeting audio into pieces according to the diarizer**
 * Tool for slicing: `ffmpeg` + thin python wrapper
 * Slice accodring to `meeting-diary.jsonl`
-* Save each segment in `/Volumes/Index/slices` in the following format: `<speaker_id>-<start HH:MM:SS.sss>-<stop HH:MM:SS.sss>.mp3`
+* Save each segment in `/Volumes/Index/slices` in the following format: `<speaker_id>-<start SS.ms>-<stop SS.ms>.wav`
 
 **5. Run an STT model on each piece**
 * STT model: TBA
