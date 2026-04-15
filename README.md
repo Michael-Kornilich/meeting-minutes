@@ -1,7 +1,9 @@
 # Audio processing from a preliminary seminar meeting at 14.04
 The goal of the mini-project is to efficiently capture, process and summarize information shared at the preliminary meeting about my seminar work.
 
-The end resuls is a `meeting.jsonl` file with the following contents:
+**Input:** a `.mp4` (or a `.wav`) file
+
+**The end result** is a `meeting.jsonl` file with the following contents:
 ```json
 {"speaker":"Francis Wong", "start": "0:00.000", "stop": "1:00:00.000", "utterance": "My fellow Americans!..."}
 {"speaker":"Student 1", "start": "1:01.000", "stop": "1:03:00.000", "utterance": "I have a question..."}
