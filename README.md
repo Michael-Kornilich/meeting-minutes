@@ -19,7 +19,7 @@ The pipeline:
 **3. Diarize the meeting**
 * Tool for sound extraction: `ffmpeg` + thin python wrapper
 * Diarizer + runtime: `pyannotate.audio`
-* Save all the results (most importantly speaker_id + segments) as `meeting-diary.jsonl` in the `/Volumes/Index/Temp`
+* Save all the results (most importantly speaker_id + segments) as `meeting-diary.jsonl` in the `/Volumes/Index/Cache`
 
 **4. Slice the meeting audio into pieces according to the diarizer**
 * Tool for slicing: `ffmpeg` + thin python wrapper
@@ -36,10 +36,10 @@ The pipeline:
 * Listen to speakers, find Francis Wong
 * Map his ID to his name. Map others are student-n (n = 1, 2,...)
 * For each entry in `meeting-diary.jsonl` format the speaker ID and time boundaries into the format of the text files
-* Create the final meeting transcript as `meeting.jsonl` with the structure from above in `/Volumes/Index/Temp`
+* Create the final meeting transcript as `meeting.jsonl` with the structure from above in `/Volumes/Index/Cache`
 
 **7. Upload files into an LLM**
-* Use the final `meeting.jsonl` and ChatGPT to summarize information into a clean `summary.md` file. Store it in `/Volumes/Index/Temp`
+* Use the final `meeting.jsonl` and ChatGPT to summarize information into a clean `summary.md` file. Store it in `/Volumes/Index/Cache`
 
 ---
 * Use git for versioning, ignore binaries. They will be backed up separately
