@@ -1,16 +1,16 @@
-# Audio processing from a preliminary seminar meeting at 14.04
+# Audio processing from a preliminary seminar meeting at 17.04
 The goal of the mini-project is to efficiently capture, process and summarize information shared at the preliminary meeting about my seminar work.
 
 **Input:** a `.mp4` (or a `.wav`) file
 
 **The end result** is a `meeting.jsonl` file with the following contents:
-```json
+```jsonl
 {"speaker":"Francis Wong", "start": "0:00.000", "stop": "1:00:00.000", "utterance": "My fellow Americans!..."}
 {"speaker":"Student 1", "start": "1:01.000", "stop": "1:03:00.000", "utterance": "I have a question..."}
+{...}
 ```
-...
 
-The pipeline:
+## The pipeline
 **1. Screen record the entire meeting - audio + video**
 * Tool: [BetterCapture](https://github.com/jsattler/BetterCapture?tab=readme-ov-file)
 * Records video, system audio, and microphone
