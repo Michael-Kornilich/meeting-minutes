@@ -1,6 +1,11 @@
 # Audio processing from a preliminary seminar meeting at 17.04
 The goal of the mini-project is to efficiently capture, process and summarize information shared at the preliminary meeting about my seminar work.
 
+**Setup:** `poetry install --with stat-modelling`
+**Run:** `cd path/to/project && clear && poetry run python run.py`
+Config: `config.json`
+
+
 **Input:** a `.mp4` (or a `.wav`) file
 
 **The end result** is a `meeting.jsonl` file with the following contents:

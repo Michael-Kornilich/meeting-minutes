@@ -1,0 +1,10 @@
+{
+  "data-dir": "/Users/Misha/Desktop/Cache/",
+  "source-video": "/Users/Misha/Desktop/video.mp4",
+  "target-dir": "/Users/Misha/Desktop",
+  "speaker-mapping": {
+    "SPEAKER_00": "Youtube dude",
+    "SPEAKER_01": "Poki",
+    "SPEAKER_02": "Lily"
+  }
+}
