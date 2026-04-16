@@ -3,3 +3,4 @@
 logs.txt
 *.ipynb
 !.gitignore
+!.python-version

@@ -4,12 +4,6 @@ from datetime import datetime
 import sys
 import json
 
-from tasks import extract_sound
-from tasks import diarize
-from tasks import slice_audio
-from tasks import stt
-from tasks import package
-
 
 class TaskSuccess:
     def __init__(self):
@@ -20,7 +14,7 @@ class Task:
     def __init__(
             self,
             name: str,
-            stdout_path: str,
+            stdout_path: str | None = None,
             verbose: bool = False,
             reroute_stdout: bool = False
     ):
@@ -35,6 +29,9 @@ class Task:
         self._original_stdout = sys.stdout
         self._original_stderr = sys.stderr
         self._separator: str = "-" * 70
+
+        if self.reroute_stdout and self.stdout_path is None:
+            raise ValueError("reroute_stdout expects stdout_path to be not None")
 
     def __enter__(self):
         if self.reroute_stdout:
@@ -55,7 +52,8 @@ class Task:
         print("\n" + self._separator)
         if err:
             self.task_success.success = False
-            print(f"\tThe task '{self.name}' failed after {m:.0f} minutes and {s:.1f} seconds on {self._end.isoformat(sep=' ')}")
+            print(
+                f"\tThe task '{self.name}' failed after {m:.0f} minutes and {s:.1f} seconds on {self._end.isoformat(sep=' ')}")
             print(f"\tReason: {err.__name__} - {value}", end="\n" * 3)
         else:
             self.task_success.success = True
@@ -70,19 +68,29 @@ class Task:
         return True
 
 
-tasks = [
-    {"name": "Extract Sound", "callable": extract_sound.main},
-    {"name": "Diarize", "callable": diarize.main},
-    {"name": "Slice Audio", "callable": slice_audio.main},
-    {"name": "Speech-To-Text", "callable": stt.main},
-    {"name": "Package result", "callable": package.main},
-]
+with Task("Setup") as task_success:
+    from tasks import extract_sound
+    from tasks import diarize
+    from tasks import slice_audio
+    from tasks import stt
+    from tasks import package
 
-with open("config.json") as f:
-    config = json.load(f)
+    tasks = [
+        {"name": "Extract Sound", "callable": extract_sound.main},
+        {"name": "Diarize", "callable": diarize.main},
+        {"name": "Slice Audio", "callable": slice_audio.main},
+        {"name": "Speech-To-Text", "callable": stt.main},
+        {"name": "Package result", "callable": package.main},
+    ]
 
-shutil.rmtree(config["data-dir"])
-os.mkdir(config["data-dir"])
+    with open("config.json") as f:
+        config = json.load(f)
+
+    shutil.rmtree(config["data-dir"])
+    os.mkdir(config["data-dir"])
+
+if not task_success.success:
+    quit()
 
 for task in tasks:
     name = task["name"]

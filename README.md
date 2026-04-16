@@ -2,11 +2,35 @@
 The goal of the mini-project is to efficiently capture, process and summarize information shared at the preliminary meeting about my seminar work.
 
 ## Usage
-**Setup:** `poetry install --with full-core,stat-modelling`
+**External requirements**
+* `python` 3.14.3 (but any 3.14.x should do)
+* `poetry` 2.3.2 (but any 2.x.x should do)
+* `ffmpeg` (full) 8.x
+
+**Setup:** 
+* Create a `.env` file in the project root
+* `cd path/to/project`
+* `poetry install --with full-core,stat-modelling`
+
+**Config:** 
+* Config file: `config.json`
+* The config file should have the following structure:
+```json
+{
+  "data-dir": "path/to/cache/directory",
+  "source-video": "path/to/source/video.mp4",
+  "target-dir": "directory/to/save/the/output/in",
+  "speaker-mapping": {
+    "SPEAKER_00": "Jack",
+    "SPEAKER_01": "Jodi",
+    "SPEAKER_02": "Max"
+  }
+}
+```
+
+* The speaker mapping does not properly work right now
 
 **Run:** `cd path/to/project && clear && poetry run python run.py`
-
-**Config:** `config.json`
 
 
 ### Input 
