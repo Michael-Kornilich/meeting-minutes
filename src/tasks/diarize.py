@@ -32,6 +32,14 @@ def main() -> None:
             token=os.environ["HF_TOKEN"]
         )
 
+        print(f"Current hyperparameter settings: {pipeline.parameters(instantiated=True)}")
+        pipeline.instantiate({
+            "segmentation": {
+                # Minimum length of silence between speakers
+                "min_duration_off": 0.8,
+            }
+        })
+
         # Tune hyperparams to have a less aggressive diarization
         print("Running the model. This will take a while...")
         output = pipeline(f"{config['data-dir']}/sound.wav")
