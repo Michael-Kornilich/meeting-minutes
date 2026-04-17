@@ -9,7 +9,7 @@ The goal of the mini-project is to efficiently capture, process and summarize in
 
 **Setup:** 
 * Create a `.env` file in the project root
-* `cd path/to/project/src`
+* `cd path/to/project`
 * `poetry install --with full-core,stat-modelling`
 
 **Config:** 
@@ -29,11 +29,7 @@ The goal of the mini-project is to efficiently capture, process and summarize in
 }
 ```
 
-* The speaker mapping does not properly work right now
-
-**Run:** `cd path/to/project/src && clear && poetry run python run.py`
-
-**WARNING:** The `data-dir` directory will be emptied as soon as the script starts. So the best practice would be to create a new directory for the project
+**Run:** `cd path/to/project && clear && poetry run python src/run.py`
 
 ### Input 
 A `.mp4` (or a `.wav`) file
@@ -81,4 +77,4 @@ A `meeting.jsonl` file with the following contents:
 
 ---
 * Use git for versioning, ignore binaries. They will be backed up separately
-* Test the pipeline on a test-meeting and on a youtube video
+* TODO: allow for more flexible speaker mapping
