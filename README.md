@@ -9,7 +9,7 @@ The goal of the mini-project is to efficiently capture, process and summarize in
 
 **Setup:** 
 * Create a `.env` file in the project root
-* `cd path/to/project`
+* `cd path/to/project/src`
 * `poetry install --with full-core,stat-modelling`
 
 **Config:** 
@@ -30,7 +30,7 @@ The goal of the mini-project is to efficiently capture, process and summarize in
 
 * The speaker mapping does not properly work right now
 
-**Run:** `cd path/to/project && clear && poetry run python run.py`
+**Run:** `cd path/to/project/src && clear && poetry run python run.py`
 
 
 ### Input 
@@ -59,7 +59,7 @@ A `meeting.jsonl` file with the following contents:
 
 **4. Slice the meeting audio into pieces according to the diarizer**
 * Tool for slicing: `ffmpeg` + thin python wrapper
-* Slice accodring to `meeting-diary.jsonl`
+* Slice according to `meeting-diary.jsonl`
 * Save each segment in `/Volumes/Index/slices` in the following format: `<speaker_id>-<start SS.ms>-<stop SS.ms>.wav`
 
 **5. Run an STT model on each piece**

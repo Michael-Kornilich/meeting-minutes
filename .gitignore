@@ -2,5 +2,6 @@
 **/__pycache__/**
 logs.txt
 *.ipynb
+
 !.gitignore
 !.python-version

@@ -12,10 +12,7 @@ def main() -> None:
 
     speaker_mapping = config["speaker-mapping"]
 
-    clean_transcript = []
-    for i in transcript:
-        j = i.copy()
-        j["speaker"] = speaker_mapping.get(j["speaker"], j["speaker"])
-        clean_transcript.append(j)
+    for i in range(len(transcript)):
+        transcript[i]["speaker"] = speaker_mapping.get(transcript[i]["speaker"], transcript[i]["speaker"])
 
-    jsonl.dump(clean_transcript, f"{config['target-dir']}/meeting.jsonl")
+    jsonl.dump(transcript, f"{config['target-dir']}/meeting.jsonl")

@@ -32,6 +32,7 @@ def main() -> None:
             token=os.environ["HF_TOKEN"]
         )
 
+        # Tune hyperparams to have a less aggressive diarization
         print("Running the model. This will take a while...")
         output = pipeline(f"{config['data-dir']}/sound.wav")
 
