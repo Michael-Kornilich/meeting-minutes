@@ -1,6 +1,7 @@
 {
+  "erase-data-dir": false,
   "data-dir": "/Volumes/Index/Cache/",
-  "source-video": "/Volumes/Index/BetterCapture/video.mp4",
-  "target-dir": "/Users/Misha/Desktop",
+  "source-video": "/Volumes/Index/BetterCapture/meeting.mp4",
+  "target-dir": "/Volumes/Index/",
   "speaker-mapping": {}
 }

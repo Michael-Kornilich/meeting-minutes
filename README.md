@@ -17,6 +17,7 @@ The goal of the mini-project is to efficiently capture, process and summarize in
 * The config file should have the following structure:
 ```json
 {
+  "erase-data-dir": false,
   "data-dir": "path/to/cache/directory",
   "source-video": "path/to/source/video.mp4",
   "target-dir": "directory/to/save/the/output/in",

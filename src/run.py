@@ -85,9 +85,10 @@ with Task("Setup") as task_success:
 
     with open("config.json") as f:
         config = json.load(f)
-
-    shutil.rmtree(config["data-dir"])
-    os.mkdir(config["data-dir"])
+    
+    if config["erase-data-dir"] is True:
+        shutil.rmtree(config["data-dir"])
+        os.mkdir(config["data-dir"])
 
 if not task_success.success:
     quit()
