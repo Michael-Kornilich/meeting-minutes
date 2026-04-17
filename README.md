@@ -32,6 +32,7 @@ The goal of the mini-project is to efficiently capture, process and summarize in
 
 **Run:** `cd path/to/project/src && clear && poetry run python run.py`
 
+**WARNING:** The `data-dir` directory will be emptied as soon as the script starts. So the best practice would be to create a new directory for the project
 
 ### Input 
 A `.mp4` (or a `.wav`) file
