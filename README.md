@@ -1,80 +1,118 @@
 # Audio processing from a preliminary seminar meeting at 17.04
-The goal of the mini-project is to efficiently capture, process and summarize information shared at the preliminary meeting about my seminar work.
+
+This project provides a modular, local-first pipeline to diarize and transcribe audio and / or video.
+
+Use cases:
+
+* Meeting minutes
+* Summarization
+* NLP (parts of the pipeline can be turned on / off)
 
 ## Usage
-**External requirements**
-* `python` 3.14.3 (but any 3.14.x should do)
-* `poetry` 2.3.2 (but any 2.x.x should do)
-* `ffmpeg` (full) 8.x
 
-**Setup:** 
-* Create a `.env` file in the project root
-* `cd path/to/project`
-* `poetry install --with full-core,stat-modelling`
+### Setup
 
-**Config:** 
-* Config file: `config.json`
-* The config file should have the following structure:
+1. Install external dependencies
+    * `python` 3.14.3 (but any 3.14.x should do)
+    * `poetry` 2.3.2 (but any 2.x.x should do)
+    * `ffmpeg` (full) 8.x
+
+2. Create a `.env` file in the project root. It should have the following content
+
+```
+export HF_TOKEN="hf_xxxxxx"
+```
+
+3. Move to the project's directory: `cd path/to/project`
+4. Install dependencies (some are redundant WIP): `poetry install --with full-core,stat-modelling`
+5. Change the default config
+   The config file should have the following structure.
+
 ```json
 {
-  "erase-data-dir": false,
-  "data-dir": "path/to/cache/directory",
-  "source-video": "path/to/source/video.mp4",
-  "target-dir": "directory/to/save/the/output/in",
-  "speaker-mapping": {
-    "SPEAKER_00": "Jack",
-    "SPEAKER_01": "Jodi",
-    "SPEAKER_02": "Max"
-  }
+  "cache": "path/to/cache/directory"
 }
 ```
 
-**Run:** `cd path/to/project && clear && poetry run python src/run.py`
+Ensure that the given path exists.
 
-### Input 
-A `.mp4` (or a `.wav`) file
+Done!
 
-### Output
-A `meeting.jsonl` file with the following contents:
-```jsonl
-{"speaker":"Francis Wong", "start": "0:00.000", "stop": "1:00:00.000", "utterance": "My fellow Americans!..."}
-{"speaker":"Student 1", "start": "1:01.000", "stop": "1:03:00.000", "utterance": "I have a question..."}
-{...}
-```
+### Run
+
+**Minimal usage example**: `poetry run python src/run.py -i /Users/Jake/Desktop/my-meeting.mp4 meeting.jsonl`
+
+Generally: `poetry run python src/run.py <args>`
+
+### CLI reference
+
+**Flags**
+
+* `--help` (`-h`) - get the CLI reference
+* `-i` - path to the input file. It can either be a video or directly a sound file.
+  Any file format is supported as long as it's supported by `ffmpeg`
+* `--with` - a comma separated list of what steps of the pipeline to *include*. All are included by default
+* `--without` - a comma separated list of what steps of the pipeline to *exclude*. None are included by default
+* `--init-cache` - if given, deletes everything from the cache directory.
+  You can specify the directory in the config.
+  If the flag is not given and the cache is not empty, the user will be prompted to proceed at their own risk
+
+**Arguments**
+
+* The first argument without a flag is the path to output the result in. Supported format is `.jsonl`
+
+**Logic**
+
+* `--with` and `--without` flags cannot be used in a single command
+* `--help` cannot be used in a combination with any other flag / argument
 
 ## The pipeline
-**1. Screen record the entire meeting - audio + video**
-* Tool: [BetterCapture](https://github.com/jsattler/BetterCapture?tab=readme-ov-file)
+
+**1. Screen records the entire meeting - audio (+ video)**
+
+* Tool for Mac: [BetterCapture](https://github.com/jsattler/BetterCapture?tab=readme-ov-file)
 * Records video, system audio, and microphone
+* Save the data
 
-**2. Save the data on the `Index` drive**
-* Save as `.mp4` in the `/Volumes/Index/BetterCapture` as `meeting.mp4`
+**2. Diarize the meeting**
 
-**3. Diarize the meeting**
 * Tool for sound extraction: `ffmpeg` + thin python wrapper
 * Diarizer + runtime: `pyannotate.audio`
 * Save all the results (most importantly speaker_id + segments) as `meeting-diary.jsonl` in the `/Volumes/Index/Cache`
 
-**4. Slice the meeting audio into pieces according to the diarizer**
+**3. Slice the meeting audio into pieces according to the diarizer**
+
 * Tool for slicing: `ffmpeg` + thin python wrapper
 * Slice according to `meeting-diary.jsonl`
 * Save each segment in `/Volumes/Index/slices` in the following format: `<speaker_id>-<start SS.ms>-<stop SS.ms>.wav`
 
-**5. Run an STT model on each piece**
-* STT model: TBA
-* Local runtime: TBA
+**4. Run an STT model on each piece**
+
+* STT model: Whisper
+* Local runtime: PyTorch (?)
 * Save each text piece in `/Volumes/Index/text-slices` as `<speaker_id>-<start HH:MM:SS.sss>-<stop HH:MM:SS.sss>.txt`
 
-**6. Package speaker + interval + text into a `meeting.jsonl` file**
+**5. Package speaker + interval + text into a `meeting.jsonl` file**
+
 * Tool: python
-* Listen to speakers, find Francis Wong
-* Map his ID to his name. Map others are student-n (n = 1, 2,...)
+* Manually listen to speakers
+* Map ID's to names / titles.
 * For each entry in `meeting-diary.jsonl` format the speaker ID and time boundaries into the format of the text files
 * Create the final meeting transcript as `meeting.jsonl` with the structure from above in `/Volumes/Index/Cache`
 
-**7. Upload files into an LLM**
-* Use the final `meeting.jsonl` and ChatGPT to summarize information into a clean `summary.md` file. Store it in `/Volumes/Index/Cache`
-
 ---
-* Use git for versioning, ignore binaries. They will be backed up separately
-* TODO: allow for more flexible speaker mapping
+
+### Details
+
+The output file has the following structure:
+
+```jsonl
+{"speaker":"SPEAKER_00", "start": "0:00.000", "stop": "1:00:00.000", "utterance": "My fellow Americans!..."}
+{"speaker":"SPEAKER_00", "start": "1:01.000", "stop": "1:03:00.000", "utterance": "I have a question..."}
+{...}
+```
+
+### Future features
+
+* More flexible speaker mapping
+* Support for `.txt` and `.md` output file formats 
