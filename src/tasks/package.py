@@ -2,12 +2,14 @@ import pickle
 import jsonl
 import json
 
+NAME = "Package"
+
 with open("config.json") as f:
     config = json.load(f)
 
 
 def main() -> None:
-    with open(f"{config['data-dir']}/transcript.pkl", mode="rb") as f:
+    with open(f"{config['cache']}/transcript.pkl", mode="rb") as f:
         transcript = pickle.load(f)
 
     speaker_mapping = config["speaker-mapping"]

@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 import pickle
 import json
 
+NAME = "Speech-To-Text"
+
 with open("config.json") as f:
     config = json.load(f)
 
@@ -27,7 +29,7 @@ def main() -> None:
     print("Importing the runtime...")
     from faster_whisper import WhisperModel
 
-    for i in Path(f"{config['data-dir']}/slices").iterdir():
+    for i in Path(f"{config['cache']}/slices").iterdir():
         if i.name.startswith("."):
             continue
         if not i.name.endswith(".wav"):
@@ -41,7 +43,7 @@ def main() -> None:
     print("Importing the model...")
     model = WhisperModel("small", compute_type="int8")
 
-    for path in Path(f"{config['data-dir']}/slices").iterdir():
+    for path in Path(f"{config['cache']}/slices").iterdir():
         print(f"Transcribing {path.name}...")
         segments, info = model.transcribe(path.absolute(), language="en")
 
@@ -67,7 +69,7 @@ def main() -> None:
 
     transcript.sort(key=lambda x: time.fromisoformat(x["start"]))
 
-    with open(f"{config['data-dir']}/transcript.pkl", mode="wb") as f:
+    with open(f"{config['cache']}/transcript.pkl", mode="wb") as f:
         pickle.dump(transcript, f)
 
     return

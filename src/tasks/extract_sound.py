@@ -2,11 +2,13 @@ from pathlib import Path
 import subprocess
 import json
 
+NAME = "Extract Sound"
+
 with open("config.json") as f:
     config = json.load(f)
 
 SOURCE = config["source-video"]
-TARGET = f"{config['data-dir']}/sound.wav"
+TARGET = f"{config['cache']}/sound.wav"
 
 def main() -> None:
     if Path(TARGET).exists():

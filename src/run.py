@@ -3,6 +3,9 @@ import shutil
 from datetime import datetime
 import sys
 import json
+import argparse
+from pathlib import Path
+from importlib import import_module
 
 
 class TaskSuccess:
@@ -68,35 +71,127 @@ class Task:
         return True
 
 
+class UniqueCSV(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        if not values:
+            return set()
+
+        raw_items = values.split(",")
+        items = [i for i in raw_items if i]
+        if len(set(items)) != len(items):
+            raise ValueError(f"The given list has duplicates in it")
+        setattr(namespace, self.dest, set(items))
+
+
+class EnsureValidPath(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        usr_path = Path(values)
+
+        if not usr_path.exists():
+            raise FileNotFoundError(f"The given path does not exist: '{usr_path.absolute()}'")
+        if not usr_path.is_dir():
+            raise ValueError(f"The given path is not a directory: '{usr_path.absolute()}'")
+
+        setattr(namespace, self.dest, usr_path)
+        return
+
+
+parser = argparse.ArgumentParser(
+    prog="PyMinutes",
+    description="This CLI provides a modular, local-first pipeline to diarize and transcribe audio and / or video",
+)
+
+parser.add_argument(
+    "--init-cache",
+    dest="init_cache",
+    action="store_true",
+    help="specify, whether to remove (possible) contents of the cache directory",
+)
+
+parser.add_argument(
+    "-i",
+    dest="input",
+    metavar="input-filepath",
+    required=True,
+    action=EnsureValidPath,
+    help="Filepath to the input file"
+)
+
+group = parser.add_mutually_exclusive_group()
+group.add_argument(
+    "--with",
+    dest="with_steps",
+    metavar="list",
+    action=UniqueCSV,
+    default=set(),
+    help="Specify, which exacts steps of the pipeline to run",
+)
+group.add_argument(
+    "--without",
+    dest="without_steps",
+    metavar="list",
+    action=UniqueCSV,
+    default=set(),
+    help="Specify, which exacts steps of the pipeline to exclude"
+)
+
+parser.add_argument(
+    "output",
+    metavar="output-filepath",
+    action=EnsureValidPath,
+    help="Filepath to the output file"
+)
+
 with Task("Setup") as task_success:
-    from tasks import extract_sound
-    from tasks import diarize
-    from tasks import slice_audio
-    from tasks import stt
-    from tasks import package
-
-    tasks = [
-        {"name": "Extract Sound", "callable": extract_sound.main},
-        {"name": "Diarize", "callable": diarize.main},
-        {"name": "Slice Audio", "callable": slice_audio.main},
-        {"name": "Speech-To-Text", "callable": stt.main},
-        {"name": "Package result", "callable": package.main},
-    ]
-
     with open("config.json") as f:
         config = json.load(f)
-    
-    if config["erase-data-dir"] is True:
-        shutil.rmtree(config["data-dir"])
-        os.mkdir(config["data-dir"])
+
+    available_tasks = ("extract_sound", "diarize", "slice_audio", "stt", "package")
+    task_registry = []
+
+    for task_file in available_tasks:
+        task = import_module("tasks." + task_file)
+        task_registry.append({
+            "name": task.NAME, "callable": task.main
+        })
+    # TODO: freeze better
+    task_registry = tuple(task_registry)
+
+    user_input = parser.parse_args()
+
+    passed_tasks = user_input.with_steps or user_input.without_steps
+    if not passed_tasks.issubset(set(available_tasks)):
+        print(f"Illegal task(s) passed: {', '.join(passed_tasks - set(available_tasks))}")
+
+    if user_input.init_cache:
+        if list(Path(config["cache"]).iterdir()):
+            inp = (f"The cache directory ({Path(config['cache']).absolute()}) is not empty. "
+                   f"Do you want to delete its contents [Y|n]? ")
+
+            if inp == "Y":
+                shutil.rmtree(config["cache"])
+                os.mkdir(config["cache"])
+            elif inp == "n":
+                print("WARNING: since the cache directory is not empty, consistency of files cannot be guaranteed")
+            else:
+                print(f"Invalid input '{inp}'")
+                quit()
+
+    if user_input.output.name.split(".")[1] != "jsonl":
+        raise ValueError(
+            f"The output file extension must be 'jsonl'. '{user_input.output.name.split('.')[1]}' was given")
+
+    if user_input.init_cache is True:
+        shutil.rmtree(config["cache"])
+        os.mkdir(config["cache"])
 
 if not task_success.success:
     quit()
 
-for task in tasks:
+for task in task_registry:
     name = task["name"]
     func = task["callable"]
-    with Task(name, "logs.txt") as task_status:
+    with Task(name) as task_status:
         func()
 
     if not task_status.success:
