@@ -139,7 +139,7 @@ parser.add_argument(
     "output",
     metavar="output-filepath",
     action=EnsureValidPath,
-    help="Filepath to the output file"
+    help="Directory to create the .jsonl file in. If --with or --without flags are used, this argument is ignored"
 )
 
 with Task("Setup") as task_success:
@@ -161,7 +161,11 @@ with Task("Setup") as task_success:
 
     passed_tasks = user_input.with_steps or user_input.without_steps
     if not passed_tasks.issubset(set(available_tasks)):
-        print(f"Illegal task(s) passed: {', '.join(passed_tasks - set(available_tasks))}")
+        raise ValueError(f"Illegal task(s) passed: {', '.join(passed_tasks - set(available_tasks))}")
+
+    if passed_tasks:
+        print("'Output' argument is ignored since the default task set has been altered "
+              "(--with or --without flag has been invoked)")
 
     if user_input.init_cache:
         if list(Path(config["cache"]).iterdir()):
@@ -174,12 +178,12 @@ with Task("Setup") as task_success:
             elif inp == "n":
                 print("WARNING: since the cache directory is not empty, consistency of files cannot be guaranteed")
             else:
-                print(f"Invalid input '{inp}'")
-                quit()
+                raise ValueError(f"Invalid input '{inp}'")
 
     if user_input.output.name.split(".")[1] != "jsonl":
         raise ValueError(
-            f"The output file extension must be 'jsonl'. '{user_input.output.name.split('.')[1]}' was given")
+            f"The output file extension must be 'jsonl'. '{user_input.output.name.split('.')[1]}' was given"
+        )
 
     if user_input.init_cache is True:
         shutil.rmtree(config["cache"])
@@ -192,7 +196,8 @@ for task in task_registry:
     name = task["name"]
     func = task["callable"]
     with Task(name) as task_status:
+        # TODO: centralize config and user arguments by passing them to each task
         func()
 
     if not task_status.success:
-        break
+        quit()
