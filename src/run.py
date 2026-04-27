@@ -97,7 +97,7 @@ class EnsureValidPath(argparse.Action):
 
 
 parser = argparse.ArgumentParser(
-    prog="PyMinutes",
+    prog="poetry run python scr/run.py",
     description="This CLI provides a modular, local-first pipeline to diarize and transcribe audio and / or video",
 )
 
@@ -142,8 +142,9 @@ parser.add_argument(
     help="Directory to create the .jsonl file in. If --with or --without flags are used, this argument is ignored"
 )
 
+user_input = parser.parse_args()
+
 with Task("Setup") as task_success:
-    # TODO: wrong path
     with open("config.json") as f:
         config = json.load(f)
 
@@ -157,8 +158,6 @@ with Task("Setup") as task_success:
         })
     # TODO: freeze better
     task_registry = tuple(task_registry)
-
-    user_input = parser.parse_args()
 
     passed_tasks = user_input.with_steps or user_input.without_steps
     if not passed_tasks.issubset(set(available_tasks)):
@@ -193,7 +192,6 @@ for task in task_registry:
     name = task["name"]
     func = task["callable"]
     with Task(name) as task_status:
-        # TODO: centralize config and user arguments by passing them to each task
         func(config, user_input)
 
     if not task_status.success:
