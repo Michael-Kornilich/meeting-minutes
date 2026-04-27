@@ -3,11 +3,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 import pickle
 import json
+from argparse import Namespace
 
 NAME = "Speech-To-Text"
-
-with open("config.json") as f:
-    config = json.load(f)
 
 
 def _seconds_to_time(string_time: str) -> time:
@@ -25,7 +23,7 @@ def _seconds_to_time(string_time: str) -> time:
     return time(h, m, s, ms)
 
 
-def main() -> None:
+def main(config: dict, usr_args: Namespace) -> None:
     print("Importing the runtime...")
     from faster_whisper import WhisperModel
 

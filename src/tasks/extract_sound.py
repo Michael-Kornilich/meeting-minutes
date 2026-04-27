@@ -1,16 +1,15 @@
 from pathlib import Path
 import subprocess
 import json
+from argparse import Namespace
 
 NAME = "Extract Sound"
 
-with open("config.json") as f:
-    config = json.load(f)
 
-SOURCE = config["source-video"]
-TARGET = f"{config['cache']}/sound.wav"
+def main(config: dict, usr_args: Namespace) -> None:
+    SOURCE = config["source-video"]
+    TARGET = f"{config['cache']}/sound.wav"
 
-def main() -> None:
     if Path(TARGET).exists():
         print("The result of this step is cached. Skipping the task")
         return

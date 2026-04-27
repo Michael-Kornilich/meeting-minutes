@@ -143,6 +143,7 @@ parser.add_argument(
 )
 
 with Task("Setup") as task_success:
+    # TODO: wrong path
     with open("config.json") as f:
         config = json.load(f)
 
@@ -162,10 +163,6 @@ with Task("Setup") as task_success:
     passed_tasks = user_input.with_steps or user_input.without_steps
     if not passed_tasks.issubset(set(available_tasks)):
         raise ValueError(f"Illegal task(s) passed: {', '.join(passed_tasks - set(available_tasks))}")
-
-    if passed_tasks:
-        print("'Output' argument is ignored since the default task set has been altered "
-              "(--with or --without flag has been invoked)")
 
     if user_input.init_cache:
         if list(Path(config["cache"]).iterdir()):
@@ -197,7 +194,7 @@ for task in task_registry:
     func = task["callable"]
     with Task(name) as task_status:
         # TODO: centralize config and user arguments by passing them to each task
-        func()
+        func(config, user_input)
 
     if not task_status.success:
         quit()

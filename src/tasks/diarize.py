@@ -4,14 +4,12 @@ from dotenv import load_dotenv
 import os
 import jsonl
 import json
+from argparse import Namespace
 
 NAME = "Diarize"
 
-with open("config.json") as f:
-    config = json.load(f)
 
-
-def main() -> None:
+def main(config: dict, usr_agrs: Namespace) -> None:
     print("Importing runtime...")
     import pyannote
     from pyannote.audio import Pipeline

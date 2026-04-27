@@ -3,6 +3,7 @@ from pathlib import Path
 import os
 import subprocess
 import json
+from argparse import Namespace
 
 NAME = "Slice Audio"
 
@@ -10,7 +11,7 @@ with open("config.json") as f:
     config = json.load(f)
 
 
-def main() -> None:
+def main(config: dict, usr_args: Namespace) -> None:
     diary = list(jsonl.load(f"{config['cache']}/meeting-diary.jsonl"))
     if not Path(f"{config['cache']}/slices/").exists():
         os.mkdir(f"{config['cache']}/slices")
