@@ -1,4 +1,4 @@
-# Audio processing from a preliminary seminar meeting at 17.04
+# Local audio / video processing pipeline for diarization and transcription
 
 This project provides a modular, local-first pipeline to diarize and transcribe audio and / or video.
 
